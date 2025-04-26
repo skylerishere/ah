@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Happy 18th Birthday, Ding Jin'en!</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: black;
+            font-family: 'Courier New', 'Segoe UI', sans-serif;
+            height: 100%;
+            width: 100%;
+            position: relative;
+        }
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 0;
+        }
+        .photo {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            max-width: 90%;
+            max-height: 60%;
+            border-radius: 20px;
+            z-index: 1; /* 始终在粒子之上 */
+        }
+        .text {
+            position: absolute;
+            top: 10%; /* 放在屏幕上方 */
+            left: 50%; /* 水平居中 */
+            transform: translate(-50%, -50%);
+            font-size: 40px; /* 增大字体 */
+            color: #ffb6c1;
+            font-weight: bold;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            z-index: 2; /* 始终在图片之上 */
+            text-shadow: 0 0 10px #ff69b4, 0 0 20px #ff69b4;
+            text-align: center; /* 居中对齐 */
+        }
+        .name {
+            position: absolute;
+            bottom: 40px; /* 放在屏幕下方与图片不重叠 */
+            left: 50%; /* 水平居中 */
+            transform: translate(-50%, 0); /* 水平居中 */
+            font-size: 40px; /* 增大名字字体 */
+            color: #ffb6c1;
+            font-weight: bold;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            z-index: 2; /* 始终在图片之上 */
+            text-shadow: 0 0 10px #ff69b4, 0 0 20px #ff69b4;
+            text-align: center; /* 居中对齐 */
+        }
+        .footer {
+            position: absolute;
+            bottom: 10px; /* 离底部60px */
+            right: 20px; /* 离右边一定距离 */
+            font-size: 14px; /* 字体较小 */
+            color: #ffffff; /* 白色字体 */
+            z-index: 2; /* 始终在图片之上 */
+        }
+        audio {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="canvas"></canvas>
+<img class="photo" src="https://i.imgur.com/IadR97o.jpeg" alt="Ding Jin'en Photo"> <!-- 请确保链接有效 -->
+<div class="text">Happy 18th Birthday</div>
+<div class="name">Ding Jin'en</div>
+<div class="footer">from Skyler</div>
+
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+let particles = [];
+
+function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+}
+resize();
+window.onresize = resize;
+
+function createParticle(x, y) {
+    const size = Math.random() * 5 + 5;
+    const speed = Math.random() * 2 + 0.5;
+    const angle = Math.random() * 2 * Math.PI;
+    const color = ['#ff69b4', '#ff1493', '#ffffff', '#ffd700'][Math.floor(Math.random() * 4)];
+    return { x, y, dx: Math.cos(angle) * speed, dy: Math.sin(angle) * speed, size, color };
+}
+function animate() {
+    ctx.fillStyle = 'rgba(0,0,0,0.2)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    particles.forEach((p, index) => {
+        p.x += p.dx;
+        p.y += p.dy;
+        p.size *= 0.98;
+        if (p.size < 0.5) particles.splice(index, 1);
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.fill();
+    });
+
+    requestAnimationFrame(animate);
+}
+
+// 自动随机粒子流动
+setInterval(() => {
+    const edge = Math.floor(Math.random() * 4);
+    let x, y;
+    if (edge === 0) { x = Math.random() * canvas.width; y = 0; }
+    else if (edge === 1) { x = canvas.width; y = Math.random() * canvas.height; }
+    else if (edge === 2) { x = Math.random() * canvas.width; y = canvas.height; }
+    else { x = 0; y = Math.random() * canvas.height; }
+
+    for (let i = 0; i < 5; i++) {
+        particles.push(createParticle(x, y));
+    }
+}, 100);
+
+// 点击/触摸生成爆炸
+canvas.addEventListener('click', (e) => {
+    for (let i = 0; i < 20; i++) {
+        particles.push(createParticle(e.clientX, e.clientY));
+    }
+});
+
+canvas.addEventListener('touchstart', (e) => {
+    const touch = e.touches[0];
+    for (let i = 0; i < 20; i++) {
+        particles.push(createParticle(touch.clientX, touch.clientY));
+    }
+});
+
+animate();
+</script>
+
+</body>
+</html>
